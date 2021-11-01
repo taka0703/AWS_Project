@@ -1,0 +1,68 @@
+#!/bin/bash
+hostip=`hostname -i | awk '{print $2}'`
+while [ true ]
+do
+# cpu 사용량 측정 
+cpu=`top -b -n1 | grep -Po '[0-9.]+ id' | awk '{printf "%.0f",100-$1}'`
+# mem 사용량 측정
+TOTAL=`free | grep Mem | awk '{print $2}'`
+USED=`free | grep Mem | awk '{print $3}'`
+use=`expr 100 \* $USED / $TOTAL`
+# disk 사용량 측정 
+DISK_TOTAL=`df -P | grep -v ^Filesystem | awk '{sum += $2} END { print sum; }'`
+DISK_USED=`df -P | grep -v ^Filesystem | awk '{sum += $3} END { print sum; }'`
+DISK_PER=`echo "100*$DISK_USED/$DISK_TOTAL" | bc -l`
+disk=`echo "$(printf %.0f $DISK_PER) "`
+
+if [ $cpu -gt 70 ]; then
+        touch /kim
+        echo "ip: $hostip" >> /kim
+        echo "CPU: $cpu %" >> /kim
+        python3 /script/cpu.py
+        rm -rf /kim
+        while [ true ]
+        do
+        cpu=`top -b -n1 | grep -Po '[0-9.]+ id' | awk '{printf "%.0f",100-$1}'`
+        if [ $cpu -lt 30 ]; then
+        break
+        fi
+        done
+fi
+
+if [ $use -gt 70 ]; then
+        touch /an
+        echo "ip: $hostip" >> /an
+        echo "memory: $use" >> /an
+        python3 /script/mem.py
+        rm -rf /an
+        while [ true ]
+        do
+        TOTAL=`free | grep Mem | awk '{print $2}'`
+        USED=`free | grep Mem | awk '{print $3}'`
+        use=`expr 100 \* $USED / $TOTAL`
+        if [ $use -lt 30 ]; then
+        break
+        fi
+        done
+fi
+
+if [ $disk -gt 70 ]; then
+    touch /jo
+    echo "ip: $hostip" >> /jo
+    echo "disk: $disk" >> /jo
+    python3 /script/disk.py
+    rm -rf /jo
+    while [ true ]
+    do 
+    DISK_TOTAL=`df -P | grep -v ^Filesystem | awk '{sum += $2} END { print sum; }'`
+    DISK_USED=`df -P | grep -v ^Filesystem | awk '{sum += $3} END { print sum; }'`
+    DISK_PER=`echo "100*$DISK_USED/$DISK_TOTAL" | bc -l`
+    disk=`echo "$(printf %.0f $DISK_PER) "`
+
+    if [ $disk -lt 50 ]; then
+        break
+        fi
+        done
+fi
+
+done
