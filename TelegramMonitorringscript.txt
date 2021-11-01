@@ -1,6 +1,6 @@
 #!/bin/bash
-hostip=`hostname -i | awk '{print $2}'`
-while [ true ]
+hostip=`hostname -i | awk '{print $2}'`                 # hotip 변수 선언 후 해당 서버의 ip부분만 추출 후 변수에 대입 
+while [ true ]                                          # 모니터링 대상서버에서 항시 돌아가고 있어야 하기 때문에 while true문 사용 
 do
 # cpu 사용량 측정 
 cpu=`top -b -n1 | grep -Po '[0-9.]+ id' | awk '{printf "%.0f",100-$1}'`
@@ -16,9 +16,9 @@ disk=`echo "$(printf %.0f $DISK_PER) "`
 
 if [ $cpu -gt 70 ]; then
         touch /kim
-        echo "ip: $hostip" >> /kim
+        echo "ip: $hostip" >> /kim                      
         echo "CPU: $cpu %" >> /kim
-        python3 /script/cpu.py
+        python3 /script/cpu.py                          
         rm -rf /kim
         while [ true ]
         do
@@ -57,8 +57,7 @@ if [ $disk -gt 70 ]; then
     DISK_TOTAL=`df -P | grep -v ^Filesystem | awk '{sum += $2} END { print sum; }'`
     DISK_USED=`df -P | grep -v ^Filesystem | awk '{sum += $3} END { print sum; }'`
     DISK_PER=`echo "100*$DISK_USED/$DISK_TOTAL" | bc -l`
-    disk=`echo "$(printf %.0f $DISK_PER) "`
-
+    disk=`echo "$(printf %.0f $DISK_PER) "`                     # 배쉬 쉘스크립트는 if문에 소수점 자리가 있으면 오류가나는데 정수형태로 바꿔주는 명령어라 생각하면됨
     if [ $disk -lt 50 ]; then
         break
         fi
