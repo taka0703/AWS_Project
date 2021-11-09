@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: ShellScripts Copy
+      copy: src=~/security_check.sh dest=~/security_check.sh
+    - name: Change Script file Permissions
+      file: dest=~/security_check.sh mode=700
+    - name: Run The Script File
+      shell: ~/security_check.sh
