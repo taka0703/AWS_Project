@@ -1,0 +1,8 @@
+import telegram
+import os 
+my_token = "1902305511:AAEfTpZikIE4-9Vgm64ZmE-Uul2bYr8qjcI"
+bot = telegram.Bot(token=my_token)
+chat_id=1932559187
+stream = os.popen('cat /kim')
+output = stream.read()
+bot.sendMessage(chat_id=chat_id,text = output )
