@@ -467,5 +467,5 @@ fi
 
 
 cat /ptxt /ntxt > /aaa
-python3 /home/itbank/python.py
+scp -i /home/ec2-user/kimkyo.pem ec2-user@10.0.1.241:/home/ec2-user/
 rm -rf /ptxt /ntxt /aaa
